@@ -29,6 +29,7 @@ print("Input: ", numberOfComics)
 """
 
 url = "https://xkcd.com/"
+# creates ./xkcd directory to save images to
 os.makedirs("xkcd", exist_ok=True)
 
 # parses the initial xkcd homepage via its url
@@ -56,5 +57,11 @@ try:
 except Exception as exc:
     print("There was a problem: %s" % (exc))
     sys.exit(1)
+
+# saves the image to ./xkcd
+imageFile = open(os.path.join("xkcd", os.path.basename(comicSrc)), 'wb')
+for chunk in res.iter_content(100000):
+    imageFile.write(chunk)
+imageFile.close()
 
 print("Done.")
