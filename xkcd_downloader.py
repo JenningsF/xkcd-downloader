@@ -1,6 +1,9 @@
 # Uses web scraper to download xkcd comics based off of user input
 # to determine how many comics should be downloaded
 
+import os, requests, bs4
+
+"""
 print("How many comics you would like to download?")
 print("Enter a positive number or 'All' to download all of the comics\n")
 
@@ -23,3 +26,23 @@ while True:
     break
 
 print("Input: ", numberOfComics)
+"""
+
+url = "https://xkcd.com"
+os.makedirs("xkcd", exist_ok=True)
+
+# downloads and parses the initial xkcd homepage
+print("Downloading page %s..." % url)
+res = requests.get(url)
+res.raise_for_status()
+soup = bs4.BeautifulSoup(res.text, "html.parser")
+
+# finds and selects the comic image
+comic = soup.select("#comic img")
+if comic == []:
+    print("Could not find comic image.")
+else:
+    comicSrc = "https:" + comic[0].get("src")
+    print("Comic source:", comicSrc)
+
+print("Done.")
