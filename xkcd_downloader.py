@@ -3,33 +3,31 @@
 
 import os, sys, requests, bs4
 
-print("How many comics you would like to download?")
-print("Enter a positive number or 'All' to download all of the comics\n")
-
-while True:
-    numberOfComics = input()
-    try:
-        numberOfComics = int(numberOfComics)
-    # if input is not a number, check if it is a valid str (all)
-    except:
-        # checks if input is any permutation of 'all'
-        if numberOfComics.lower() != "all":
+def user_input():
+    print("How many comics you would like to download?")
+    print("Enter a positive number or 'All' to download all of the comics\n")
+    while True:
+        numberOfComics = input()
+        try:
+            numberOfComics = int(numberOfComics)
+        # if input is not a number, check if it is a valid str (all)
+        except:
+            # checks if input is any permutation of 'all'
+            if numberOfComics.lower() != "all":
+                print("Invalid input! Please enter a positive number or 'All'.\n")
+            else:
+                return numberOfComics
+            continue
+        # if input is a number, check if it is positive
+        if numberOfComics < 1:
             print("Invalid input! Please enter a positive number or 'All'.\n")
-        else:
-            break
-        continue
-    # if input is a number, check if it is positive
-    if numberOfComics < 1:
-        print("Invalid input! Please enter a positive number or 'All'.\n")
-        continue
-    break
-
-url = "https://xkcd.com/"
-# creates ./xkcd directory to save images to
-os.makedirs("xkcd", exist_ok=True)
+            continue
+        return numberOfComics
 
 # while not url.endswith('#'):
-for _ in range(numberOfComics):
+# for _ in range(numberOfComics):
+
+def download_xkcd(url):
     # parses the xkcd homepage via its url
     print("Downloading page %s..." % url)
     res = requests.get(url)
@@ -76,5 +74,29 @@ for _ in range(numberOfComics):
     # get the previous button's url to navigate to the previous comic
     prevLink = soup.select("a[rel='prev']")[0]
     url = "https://xkcd.com" + prevLink.get("href")
+    return url
 
-print("Done.")
+def main():
+    os.system("cls")
+    numberOfComics = user_input()
+
+    # sets initial url
+    url = "https://xkcd.com/"
+    # keeps count of how many times a file is downloaded
+    fileCount = 0
+    # creates ./xkcd directory to save images to
+    os.makedirs("xkcd", exist_ok=True)
+
+
+    if numberOfComics == "all":
+        while not url.endswith('#'):
+            url = download_xkcd(url)
+            fileCount += 1
+    else:
+        for _ in range(numberOfComics):
+            url = download_xkcd(url)
+            fileCount += 1
+
+    print("\nDone. %i files have been downloaded" % fileCount)
+
+main()
