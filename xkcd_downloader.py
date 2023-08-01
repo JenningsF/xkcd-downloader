@@ -3,7 +3,6 @@
 
 import os, sys, requests, bs4
 
-"""
 print("How many comics you would like to download?")
 print("Enter a positive number or 'All' to download all of the comics\n")
 
@@ -25,43 +24,54 @@ while True:
         continue
     break
 
-print("Input: ", numberOfComics)
-"""
-
 url = "https://xkcd.com/"
 # creates ./xkcd directory to save images to
 os.makedirs("xkcd", exist_ok=True)
 
-# parses the initial xkcd homepage via its url
-print("Downloading page %s..." % url)
-res = requests.get(url)
-try:
-    res.raise_for_status()
-except Exception as exc:
-    print("There was a problem: %s" % (exc))
-    sys.exit(1)
-soup = bs4.BeautifulSoup(res.text, "html.parser")
+# while not url.endswith('#'):
+for _ in range(numberOfComics):
+    # parses the xkcd homepage via its url
+    print("Downloading page %s..." % url)
+    res = requests.get(url)
+    try:
+        res.raise_for_status()
+    except Exception as exc:
+        print("There was a problem: %s" % (exc))
+        sys.exit(1)
+    soup = bs4.BeautifulSoup(res.text, "html.parser")
 
-# finds the comic image url
-comic = soup.select("#comic img")
-if comic == []:
-    print("Could not find comic image.")
-else:
-    comicSrc = "https:" + comic[0].get("src")
+    # finds the comic image url
+    comic = soup.select("#comic img")
+    if comic == []:
+        print("Could not find comic image.")
+    else:
+        comicSrc = "https:" + comic[0].get("src")
 
-# downloads image from comic image url
-print("Downloading image %s..." % comicSrc)
-res = requests.get(comicSrc)
-try:
-    res.raise_for_status()
-except Exception as exc:
-    print("There was a problem: %s" % (exc))
-    sys.exit(1)
+    # downloads image from comic image url
+    print("Downloading image %s..." % comicSrc)
+    res = requests.get(comicSrc)
+    try:
+        res.raise_for_status()
+    except Exception as exc:
+        print("There was a problem: %s" % (exc))
+        sys.exit(1)
 
-# saves the image to ./xkcd
-imageFile = open(os.path.join("xkcd", os.path.basename(comicSrc)), 'wb')
-for chunk in res.iter_content(100000):
-    imageFile.write(chunk)
-imageFile.close()
+    # retrieves the comic number for the filename to assist in image ordering
+    comicNumber = soup.find(id="middleContainer").findAll('a')
+    comicNumber = comicNumber[-2].get("href")
+    comicNumber = comicNumber.rsplit('/', 1)[-1]
+    filename = comicNumber + "_" + os.path.basename(comicSrc)
+
+    # saves the image to ./xkcd
+    imageFile = open(os.path.join("xkcd", os.path.basename(filename)), 'wb')
+    for chunk in res.iter_content(100000):
+        imageFile.write(chunk)
+    imageFile.close()
+    print("Image %s saved" % filename)
+
+    # get the previous button's url to navigate to the previous comic
+    prevLink = soup.select("a[rel='prev']")[0]
+    url = "https://xkcd.com" + prevLink.get("href")
+    print(url)
 
 print("Done.")
