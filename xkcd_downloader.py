@@ -64,14 +64,17 @@ for _ in range(numberOfComics):
 
     # saves the image to ./xkcd
     imageFile = open(os.path.join("xkcd", os.path.basename(filename)), 'wb')
-    for chunk in res.iter_content(100000):
-        imageFile.write(chunk)
+    try:
+        with open(os.path.join("xkcd", os.path.basename(filename)), 'wb') as imageFile:
+            for chunk in res.iter_content(100000):
+                imageFile.write(chunk)
+        print("Successfully saved image %s!" % filename)
+    except IOError as err:
+        print("Error in saving image: %s" % (err))
     imageFile.close()
-    print("Image %s saved" % filename)
 
     # get the previous button's url to navigate to the previous comic
     prevLink = soup.select("a[rel='prev']")[0]
     url = "https://xkcd.com" + prevLink.get("href")
-    print(url)
 
 print("Done.")
