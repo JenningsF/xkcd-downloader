@@ -16,6 +16,7 @@ def user_input():
             if numberOfComics.lower() != "all":
                 print("Invalid input! Please enter a positive number or 'All'.\n")
             else:
+                numberOfComics = numberOfComics.lower()
                 return numberOfComics
             continue
         # if input is a number, check if it is positive
@@ -86,7 +87,6 @@ def main():
     fileCount = 0
     # creates ./xkcd directory to save images to
     os.makedirs("xkcd", exist_ok=True)
-
 
     if numberOfComics == "all":
         while not url.endswith('#'):
