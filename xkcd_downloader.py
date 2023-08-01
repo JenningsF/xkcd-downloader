@@ -88,15 +88,19 @@ def main():
     # creates ./xkcd directory to save images to
     os.makedirs("xkcd", exist_ok=True)
 
-    if numberOfComics == "all":
-        while not url.endswith('#'):
-            url = download_xkcd(url)
-            fileCount += 1
-    else:
-        for _ in range(numberOfComics):
-            url = download_xkcd(url)
-            fileCount += 1
-
-    print("\nDone. %i files have been downloaded" % fileCount)
+    try:
+        if numberOfComics == "all":
+            while not url.endswith('#'):
+                url = download_xkcd(url)
+                fileCount += 1
+        else:
+            for _ in range(numberOfComics):
+                url = download_xkcd(url)
+                fileCount += 1
+        print("\nDone. %i files have been downloaded" % fileCount)
+    
+    except KeyboardInterrupt:
+        print("\nOperation cancelled by KeyboardInterrupt")
+        print("%i files have been downloaded" % fileCount)
 
 main()
